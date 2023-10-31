@@ -44,12 +44,23 @@ const createViewer = async (
   if (!UserInterface.checkForWebGL(rootContainer)) {
     throw new Error('WebGL could not be loaded.')
   }
+  var store
+  function clickCallback(e) {
+    store.eventEmitter.emit('clickCallback', e)
+  }
+
+  proxyConfiguration.definitions.Views.ItkVtkView.options.clickCallback = clickCallback
 
   const proxyManager = vtkProxyManager.newInstance({ proxyConfiguration })
   window.addEventListener('resize', proxyManager.resizeAllViews)
 
-  const store = new ViewerStore(proxyManager)
-
+  store = new ViewerStore(proxyManager)
+  store.eventEmitter.on('clickCallback', e => {
+    console.log(e)
+  })
+  store.eventEmitter.on('screenshotTaken', e => {
+    console.log(e)
+  })
   const publicAPI = {}
 
   const debug = false
@@ -180,6 +191,9 @@ const createViewer = async (
             break
           case 'SCREENSHOT_TAKEN':
             eventEmitter.emit('screenshotTaken', event.data)
+            break
+          case 'CLICKCALLBACK':
+            eventEmitter.emit('clickCallback', event.data)
             break
           case 'TAKE_SCREENSHOT':
             break
@@ -449,6 +463,7 @@ const createViewer = async (
     'pointSetSizeChanged',
     'pointSetRepresentationChanged',
     'screenshotTaken',
+    'clickCallback',
   ]
 
   publicAPI.getEventNames = () => eventNames
