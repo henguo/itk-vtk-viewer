@@ -338,7 +338,10 @@ const createViewerMachine = (options, context, eventEmitterCallback) => {
             SCREENSHOT_TAKEN: {
               actions: [forwardTo('eventEmitter')],
             },
-            CLICKCALLBACK: {
+            LEFTCLICKCALLBACK: {
+              actions: [forwardTo('eventEmitter')],
+            },
+            RIGHTCLICKCALLBACK: {
               actions: [forwardTo('eventEmitter')],
             },
             SET_FIXED_IMAGE: {

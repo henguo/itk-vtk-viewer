@@ -23,6 +23,7 @@ import {
 
 import { reaction, toJS } from 'mobx'
 import PQueue from 'p-queue'
+import { proxy } from 'vtk.js/Sources/macros'
 
 const createViewer = async (
   rootContainer,
@@ -45,20 +46,24 @@ const createViewer = async (
     throw new Error('WebGL could not be loaded.')
   }
   var store
-  function clickCallback(e) {
-    store.eventEmitter.emit('clickCallback', e)
+  function leftclickCallback(e) {
+    store.eventEmitter.emit('leftclickCallback', e)
+  }
+  function rightclickCallback(e) {
+    store.eventEmitter.emit('rightclickCallback', e)
   }
 
-  proxyConfiguration.definitions.Views.ItkVtkView.options.clickCallback = clickCallback
+  proxyConfiguration.definitions.Views.ItkVtkView.options.leftclickCallback = leftclickCallback
+  proxyConfiguration.definitions.Views.ItkVtkView.options.rightclickCallback = rightclickCallback
 
   const proxyManager = vtkProxyManager.newInstance({ proxyConfiguration })
   window.addEventListener('resize', proxyManager.resizeAllViews)
 
   store = new ViewerStore(proxyManager)
-  store.eventEmitter.on('clickCallback', e => {
+  store.eventEmitter.on('leftclickCallback', e => {
     console.log(e)
   })
-  store.eventEmitter.on('screenshotTaken', e => {
+  store.eventEmitter.on('rightclickCallback', e => {
     console.log(e)
   })
   const publicAPI = {}
@@ -192,8 +197,11 @@ const createViewer = async (
           case 'SCREENSHOT_TAKEN':
             eventEmitter.emit('screenshotTaken', event.data)
             break
-          case 'CLICKCALLBACK':
-            eventEmitter.emit('clickCallback', event.data)
+          case 'LEFTCLICKCALLBACK':
+            eventEmitter.emit('leftclickCallback', event.data)
+            break
+          case 'RIGHTCLICKCALLBACK':
+            eventEmitter.emit('rightclickCallback', event.data)
             break
           case 'TAKE_SCREENSHOT':
             break
@@ -463,7 +471,8 @@ const createViewer = async (
     'pointSetSizeChanged',
     'pointSetRepresentationChanged',
     'screenshotTaken',
-    'clickCallback',
+    'leftclickCallback',
+    'rightclickCallback',
   ]
 
   publicAPI.getEventNames = () => eventNames

@@ -410,8 +410,13 @@ function ItkVtkViewProxy(publicAPI, model) {
   model.annotationPicker.setPickFromList(1)
   model.annotationPicker.initializePickList()
   model.interactor.onLeftButtonPress(() => {
-    if (model.clickCallback && model.lastPickedValues) {
-      model.clickCallback(model.lastPickedValues)
+    if (model.leftclickCallback && model.lastPickedValues) {
+      model.leftclickCallback(model.lastPickedValues)
+    }
+  })
+  model.interactor.onRightButtonPress(() => {
+    if (model.rightclickCallback && model.lastPickedValues) {
+      model.rightclickCallback(model.lastPickedValues)
     }
   })
   model.interactor.onMouseMove(event => {
@@ -1124,7 +1129,8 @@ const DEFAULT_VALUES = {
   neCornerAnnotation: CursorCornerAnnotation,
   labelIndex: null,
   labelNames: null,
-  clickCallback: null,
+  leftclickCallback: null,
+  rightclickCallback: null,
   lengthPixelRatio: 1.0,
   lastPickedValues: {
     iIndex: null,
@@ -1164,7 +1170,8 @@ export function extend(publicAPI, model, initialValues = {}) {
     'neCornerAnnotation',
     'labelNames',
     'labelIndex',
-    'clickCallback',
+    'leftclickCallback',
+    'rightclickCallback',
     'xyLowerLeft',
     'axesNames',
   ])
